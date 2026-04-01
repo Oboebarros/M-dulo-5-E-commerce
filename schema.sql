@@ -1,17 +1,17 @@
 -- Script de Creación de Base de Datos para OboeMarket
--- Módulo 5: Java Web (JSP + Servlets + DAO + MVC)
+-- Módulo 5
 
 CREATE DATABASE IF NOT EXISTS oboemarket_db;
 USE oboemarket_db;
 
--- 1. Tabla de Categorías (Requerido para diseño en la rúbrica)
+-- 1. Tabla de Categorías 
 CREATE TABLE IF NOT EXISTS categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL UNIQUE,
     descripcion TEXT
 );
 
--- 2. Tabla de Productos (Principal)
+-- 2. Tabla de Productos 
 CREATE TABLE IF NOT EXISTS productos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
@@ -27,28 +27,34 @@ CREATE TABLE IF NOT EXISTS productos (
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 3. Tabla de Clientes (Requerido por la rúbrica para el diseño)
-CREATE TABLE IF NOT EXISTS customers (
+-- 3. Tabla de Usuarios (Módulo 6: Seguridad y Roles)
+CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
+    nombre VARCHAR(50) NOT NULL,
+    apellido VARCHAR(50) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
-    direccion TEXT,
-    telefono VARCHAR(20),
+    rol VARCHAR(20) NOT NULL DEFAULT 'CLIENT',
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 4. Tabla de Pedidos (Requerido por la rúbrica para el diseño)
+-- DATOS DE PRUEBA (USUARIOS)
+-- Contraseña 'admin123' encriptada con BCrypt (ejemplo)
+INSERT INTO users (nombre, apellido, email, password, rol) VALUES 
+('Admin', 'Oboe', 'admin@oboemarket.cl', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.TVuHOnu', 'ADMIN'),
+('Cliente', 'Prueba', 'cliente@gmail.com', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.TVuHOnu', 'CLIENT');
+
+-- 4. Tabla de Pedidos 
 CREATE TABLE IF NOT EXISTS orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     customer_id INT,
     fecha_pedido TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     total DECIMAL(12, 2) NOT NULL,
     estado VARCHAR(20) DEFAULT 'PENDIENTE',
-    FOREIGN KEY (customer_id) REFERENCES customers(id)
+    FOREIGN KEY (customer_id) REFERENCES users(id)
 );
 
--- 5. Tabla de Ítems de Pedido (Requerido por la rúbrica para el diseño)
+-- 5. Tabla de Ítems de Pedido 
 CREATE TABLE IF NOT EXISTS order_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT,
@@ -66,17 +72,17 @@ TRUNCATE TABLE orders;
 TRUNCATE TABLE productos;
 SET FOREIGN_KEY_CHECKS = 1;
 
--- DATOS DE PRUEBA (PRODUCTOS) - 12 PRODUCTOS ÚNICOS
-INSERT INTO productos (nombre, descripcion, descripcion_larga, precio, categoria, subcategoria, imagen_url, material, nivel) VALUES 
-('Oboe Buffet Crampon Legende', 'Oboe profesional de alta gama.', 'El oboe Légende es un instrumento excepcional con un timbre rico y flexible. Fabricado con madera de granadilla seleccionada y llaves de plata.', 9500000, 'Instrumentos', 'Profesional', 'assets/img/legende oboe 1.png', 'Madera de Granadilla', 'Profesional'),
-('Oboe Buffet Crampon Prodige', 'Oboe para estudiantes avanzados.', 'Diseñado para facilitar la transición al nivel profesional. Ofrece una respuesta rápida y una afinación impecable.', 4200000, 'Instrumentos', 'Estudiante', 'assets/img/prodige 1.png', 'Resina / Madera', 'Intermedio'),
-('Mandril Chiarugi Oboe', 'Herramienta de precisión para el atado de cañas.', 'Mandril ergonómico de alta calidad para tubos Chiarugi. Indispensable para el oboísta moderno.', 35000, 'Herramientas', 'Atado', 'assets/img/mandril.png', 'Acero / Madera', 'Todos'),
-('Tubo Chiarugi 47mm 2', 'Tubo estándar para cañas de oboe.', 'Tubo de latón con corcho natural. Proporciona una vibración estable y clara.', 4500, 'Accesorios', 'Cañas', 'assets/img/tubo chiarugi.png', 'Latón / Corcho', 'Todos'),
-('Caña Rigoti Profesional', 'Caña terminada a mano lista para tocar.', 'Caña de dureza media, raspado europeo. Excelente proyección y estabilidad.', 18000, 'Accesorios', 'Cañas', 'assets/img/rigoti cañas.png', 'Arundo Donax', 'Profesional'),
-('Hilo para Atado Rigoti', 'Hilo de nylon resistente para cañas.', 'Hilo de alta calidad disponible en varios colores para el atado profesional de cañas de oboe.', 8000, 'Herramientas', 'Atado', 'assets/img/Hilo.png', 'Nylon', 'Todos'),
-('Soporte Doble Oboe/Corno', 'Soporte estable para dos instrumentos.', 'Soporte metálico con recubrimiento protector para oboe y corno inglés. Plegable y ligero.', 45000, 'Accesorios', 'Soportes', 'assets/img/SOPORTE OBOE Y CORNO INGLES.png', 'Metal', 'Todos'),
-('Caja para 12 Cañas', 'Caja de madera con ventilación.', 'Caja elegante para almacenar hasta 12 cañas de oboe. Mantiene la humedad ideal.', 55000, 'Almacenamiento', 'Cajas', 'assets/img/caja 12.png', 'Madera de Nogal', 'Todos'),
-('Estuche para 6 Cañas', 'Estuche compacto y seguro.', 'Estuche rígido para 6 cañas con interior de terciopelo. Ideal para el transporte diario.', 28000, 'Almacenamiento', 'Estuches', 'assets/img/caña 6.png', 'Plástico / Terciopelo', 'Todos'),
-('Set Chiarugi Desplegado', 'Kit completo de herramientas.', 'Incluye mandril, bloque de corte y rascadores. Todo lo necesario para fabricar cañas.', 120000, 'Herramientas', 'Sets', 'assets/img/chiarugi desplegado.png', 'Varios', 'Avanzado'),
-('Kit Chiarugi Economic', 'Kit básico de herramientas.', 'Versión económica con las herramientas esenciales para principiantes en el raspado.', 65000, 'Herramientas', 'Económico', 'assets/img/chiarugi economic.png', 'Varios', 'Principiante'),
-('Collar Ergonómico', 'Collar ajustable con gancho metálico.', 'Reduce la tensión en el pulgar y cuello. Acolchado de alta densidad para mayor confort.', 32000, 'Accesorios', 'Soportes', 'assets/img/collar 1.png', 'Neopreno / Cuero', 'Todos');
+-- DATOS DE PRUEBA (PRODUCTOS)
+INSERT INTO productos (nombre, descripcion, precio, categoria, subcategoria, imagen_url) VALUES 
+ ('Oboe Buffet Légende',      'Gama alta profesional de Buffet Crampon.',           9500000.00, 'Instrumentos', 'Profesional',    'assets/img/legende oboe 1.png'), 
+ ('Oboe Buffet Prodige',      'Perfecto para estudiantes. Resina ABS.',             2200000.00, 'Instrumentos', 'Estudiante',     'assets/img/prodige 1.png'), 
+ ('Estuche Reeds n Stuff (12)','Caja de madera para 12 cañas.',                      38000.00, 'Almacenamiento','Cañas',          'assets/img/caja 12.png'), 
+ ('Estuche Reeds n Stuff (6)', 'Caja de madera para 6 cañas.',                       22000.00, 'Almacenamiento','Cañas',          'assets/img/caña 6.png'), 
+ ('Navaja Chiarugi Económica', 'Navaja estudiante biselada.',                        25000.00, 'Herramientas', 'Navajas',        'assets/img/chiarugi economic.png'), 
+ ('Navaja Chiarugi Profesional','Filo profesional para raspado preciso.',            52000.00, 'Herramientas', 'Navajas',        'assets/img/chiarugi desplegado.png'), 
+ ('Mandril Chiarugi',          'Herramienta de montaje esencial.',                   22000.00, 'Herramientas', 'Montaje',        'assets/img/mandril.png'), 
+ ('Hilo de Seda',              'Hilo resistente para atado de cañas.',               12000.00, 'Herramientas', 'Atado',          'assets/img/Hilo.png'), 
+ ('Tubo Chiarugi N°2',         'Tudeles de precisión para montaje.',                  3500.00, 'Accesorios',   'Tubos',          'assets/img/tubo chiarugi.png'), 
+ ('Palas Rigotti',             '10 palas de maderas seleccionadas.',                 18000.00, 'Accesorios',   'Materia Prima',  'assets/img/rigoti cañas.png'), 
+ ('Soporte Oboe y Corno Inglés','Soporte doble de alta estabilidad.',                30000.00, 'Accesorios',   'Soportes',       'assets/img/SOPORTE OBOE Y CORNO INGLES.png'), 
+ ('Colgador Oboe',             'Arnés cómodo para estudio.',                         25000.00, 'Accesorios',   'Correas',        'assets/img/collar 1.png');
